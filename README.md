@@ -1,5 +1,4 @@
 # streamlink-bongacams
-======================
 streamlink-bongacams lets you follow and archive your selected models shows on www.bongacams.com and Bongacams white labels sites.
 BC streamlink-bongacams plugin that you see here use the SM_Model.txt where is a list of your favourites BC models.
 You don't need to be registered bongacams user for recording models with this streamlink-bongacams plugin.
