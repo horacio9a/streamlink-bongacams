@@ -15,8 +15,8 @@ Setup
 1. Install requirements `pip install -r Requirements.txt`. Streamlink can be installed as a stand-alone program but my recommendation is to install it as a python module along with other modules.
 2. Download and unpack the [code](https://codeload.github.com/horacio9a/streamlink-bongacams/zip/master).
 3. BC streamlink-bongacams plugin `bongacams.py` must replace old plugin in `C:/Python27/Lib/site-packages/streamlink/plugins/bongacams.py`
-4. Batch script sm.bat can be anywhere (default is C:/Windows/).
-5. BC favourite list `BC_Model.txt` can be anywhere (default is C:/Windows/).
+4. Batch script sm.bat can be anywhere (default is `C:/Windows`).
+5. BC favourite list `BC_Model.txt` can be anywhere (default is `C:/Windows`).
 6. `config.cfg` must be in `C:/Python27/config.cfg`. Edit `config.cfg` to your wish or accept default data. You must enter the correct location on your computer for all the files that are there. In that case, those files do not have to be in the path.
 
 Running & Output
@@ -26,3 +26,5 @@ For easier use of this plugin it would be good to make a shortcut and put it in 
 However, if you want to record a certain model permanently (24/7), then you need to use `bc.bat`, options number `1` and `0` for online use.
 For permanently recording more than one model at the same time you need to start another copy of `bc.bat`. 
 Recording is best abort with Ctrl-C or by clicking 'x' at the top right corner of the script window If Ctrl-C does not react.
+
+![alt screenshot](./screenshot.jpg)
