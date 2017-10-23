@@ -1,4 +1,4 @@
-# Bongacams Streamlink FFMPG/FFPLAY Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
+# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
 
 import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
