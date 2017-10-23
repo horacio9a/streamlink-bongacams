@@ -1,4 +1,5 @@
 streamlink==0.7.0
+livestreamer==1.12.2
 DateTime==4.1.1
 requests==2.18.1
 Command==0.1.0
