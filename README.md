@@ -29,6 +29,6 @@ Recording is best abort with Ctrl-C or by clicking 'x' at the top right corner o
 
 ![alt screenshot](./screenshot.jpg)
 
-If you don't want to keep track of a specific model, then you can use `bongacams2.py` which has play option and it is possible to use the same script window to start many models.
+If you don't want to keep track of a specific model, then you can use `bongacams2.py` which has many options and it is possible to use the same script window to start many models.
 
 ![alt screenshot](./screenshot2.jpg)
