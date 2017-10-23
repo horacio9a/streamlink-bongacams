@@ -1,4 +1,4 @@
-# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
+# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM/YOUTUBE-DL Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
 
 import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
@@ -119,8 +119,7 @@ class bongacams(Plugin):
            while True:
             try:
              print
-             mode = int(raw_input(colored(" => Select mode => LIVESTREAMER(3) FFMPEG(2) FFPLAY(1) RTMPDUMP(0) => ", "yellow", "on_blue")))
-             print
+             mode = int(raw_input(colored(" => Mode => YTDL-TS(5) YTDL-FLV(4) LS(3) FFMPEG(2) FFPLAY(1) RTMP(0) => ", "yellow", "on_blue")))
              break
             except ValueError:
              print(colored("\n => Input must be a number <=", "yellow", "on_red"))
@@ -131,27 +130,33 @@ class bongacams(Plugin):
            if mode == 2:
              mod = 'FFMPEG'
            if mode == 3:
-             mod = 'LIVESTREAMER'
+             mod = 'LS'
+           if mode == 4:
+             mod = 'YTDL-FLV'
+           if mode == 5:
+             mod = 'YTDL-TS'
 
            timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
            stime = str(time.strftime("%H:%M:%S"))
-           path = config.get('folders', 'output_folder')
+           path = config.get('folders', 'output_folder_BC')
            fn1 = performer + '_BC_' + timestamp + '.flv'
            fn2 = performer + '_BC_' + timestamp + '.mp4'
+           fn3 = performer + '_BC_' + timestamp + '.ts'
            pf1 = (path + fn1)
            pf2 = (path + fn2)
+           pf3 = (path + fn3)
            rtmpdump = config.get('files', 'rtmpdump')
            ffmpeg = config.get('files', 'ffmpeg')
            ffplay = config.get('files', 'ffplay')
            livestreamer = config.get('files', 'livestreamer')
+           youtube = config.get('files', 'youtube')
            swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
 
-           if mod == 'RTMPDUMP':
+           if mod == 'RTMP':
             uidn = random.randint(1000000,9999999)
             uid = '150318{}'.format(uidn)
-            print (colored(" => Random UID => {} <=", "yellow", "on_blue")).format(uid)
-            print
-            print (colored(' => RTMPDUMP => {} <=', 'yellow', 'on_red')).format(fn1)
+            print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
+            print (colored('\n => RTMP => {} <=', 'yellow', 'on_red')).format(fn1)
             print
             command = 'start {} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -y"stream_{}?uid={}" -o"{}"'.format(rtmpdump,server,swf,performer,uid,pf1)
             os.system(command)
@@ -159,7 +164,7 @@ class bongacams(Plugin):
             sys.exit()
 
            if mod == 'FFPLAY':
-            print (colored(" => FFPLAY => {} <=", "yellow", "on_magenta")).format(fn1)
+            print (colored("\n => FFPLAY => {} <=", "yellow", "on_magenta")).format(fn1)
             print
             command = ('start {} -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,performer,stime,urlnoproto))
             os.system(command)
@@ -167,19 +172,37 @@ class bongacams(Plugin):
             sys.exit()
 
            if mod == 'FFMPEG':
-            print (colored(" => FFMPEG => {} <=","yellow","on_red")).format(fn1)
+            print (colored("\n => FFMPEG => {} <=","yellow","on_red")).format(fn1)
             print
             command = ('start {} -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf1))
             os.system(command)
             print(colored(" => END <= ", "yellow","on_blue"))
             sys.exit()
 
-           if mod == 'LIVESTREAMER':
-            print (colored(' => LIVESTREAMER => {} <=', 'yellow', 'on_red')).format(fn2)
+           if mod == 'LS':
+            print (colored('\n => LIVESTREAMER => {} <=', 'yellow', 'on_red')).format(fn2)
             print
-            command = ('start {} "{}" best -o {}'.format(livestreamer,ls_url,pf2))
+            command = ('start {} {} best -o {}'.format(livestreamer,ls_url,pf2))
             os.system(command)
             print(colored(" => END <= ", 'yellow','on_blue'))
+            sys.exit()
+
+           if mod == 'YTDL-FLV':
+            uidn = random.randint(1000000,9999999)
+            uid = '150318{}'.format(uidn)
+            print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
+            print (colored('\n => YTDL-FLV => {} <=', 'yellow', 'on_red')).format(fn1)
+            rtmp_url = ('rtmp://{}:1935/bongacams/stream_{}?uid={}'.format(server,performer,uid))
+            command = ('start {} --no-part {} -o {}'.format(youtube,rtmp_url,pf1))
+            os.system(command)
+            print(colored("\n => END <= ", 'yellow','on_blue'))
+            sys.exit()
+
+           if mod == 'YTDL-TS':
+            print (colored('\n => YTDL-TS => {} <=', 'yellow', 'on_red')).format(fn3)
+            command = ('start {} --hls-use-mpegts --no-part {} -o {}'.format(youtube,hls_url,pf3))
+            os.system(command)
+            print(colored("\n => END <= ", 'yellow','on_blue'))
             sys.exit()
 
          except Exception as e:
