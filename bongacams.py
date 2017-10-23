@@ -117,19 +117,19 @@ class bongacams(Plugin):
           for s in HLSStream.parse_variant_playlist(self.session, hls_url, headers=headers).items():
            timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
            stime = str(time.strftime("%H:%M:%S"))
-           path = config.get('folders', 'output_folder')
+           path = config.get('folders', 'output_folder_BC')
            filename = performer + '_BC_' + timestamp + '.flv'
            pf = (path + filename)
-           rtmpdump = config.get('files', 'rtmpdump')
-           swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
+           youtube = config.get('files', 'youtube')
            uidn = random.randint(1000000,9999999)
            uid = '150318{}'.format(uidn)
+           rtmp_url = ('rtmp://{}:1935/bongacams/stream_{}?uid={}'.format(server,performer,uid))
            print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
-           print (colored('\n => RTMPDUMP => {} <=', 'yellow', 'on_red')).format(filename)
+           print (colored('\n => YOUTUBE-DL REC => {} <=', 'yellow', 'on_red')).format(filename)
            print
-           command = '{} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -y"stream_{}?uid={}" -o"{}" -q'.format(rtmpdump,server,swf,performer,uid,pf)
+           command = ('{} --hls-prefer-native --no-part "{}" -o {}'.format(youtube,rtmp_url,pf))
            os.system(command)
-           print(colored(" => END <= ", 'yellow','on_blue'))
+           print(colored("\n => END <= ", 'yellow','on_blue'))
            sys.exit()
 
          except Exception as e:
