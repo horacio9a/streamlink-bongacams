@@ -1,7 +1,6 @@
-# Bongacams Streamlink Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
+# Bongacams Streamlink RTMPDUMP 24/7 Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
 
-import sys, os, json, re, time, datetime, command
-
+import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
 from streamlink.exceptions import PluginError, NoStreamsError
 from streamlink.plugin.api import validate, http, useragents
@@ -109,8 +108,9 @@ class bongacams(Plugin):
         print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(performer)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
-        print (colored("\n => Server URL => {} <=", "yellow", "on_blue")).format(urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
+        server = re.sub('https://', '', urlnoproto)
+        print (colored("\n => Server => {} <=", "yellow", "on_blue")).format(server)
 
         if hls_url:
          try:
@@ -120,15 +120,18 @@ class bongacams(Plugin):
            path = config.get('folders', 'output_folder')
            filename = performer + '_BC_' + timestamp + '.flv'
            pf = (path + filename)
-           ffmpeg = config.get('files', 'ffmpeg')
-
+           rtmpdump = config.get('files', 'rtmpdump')
+           swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
+           uidn = random.randint(1000000,9999999)
+           uid = '150318{}'.format(uidn)
+           print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
+           print (colored('\n => RTMPDUMP => {} <=', 'yellow', 'on_red')).format(filename)
            print
-           print (colored(" => REC => {} <=","yellow","on_red")).format(filename)
-           command = ('{} -hide_banner -loglevel panic -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf))
+           command = '{} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -y"stream_{}?uid={}" -o"{}" -q'.format(rtmpdump,server,swf,performer,uid,pf)
            os.system(command)
-           print
-           print(colored(" => END <= ", "yellow","on_blue"))
+           print(colored(" => END <= ", 'yellow','on_blue'))
            sys.exit()
+
          except Exception as e:
            if '404' in str(e):
               print(colored("\n => Performer is AWAY or PRIVATE <=","yellow","on_red"))
