@@ -1,7 +1,6 @@
 # Bongacams Streamlink FFMPG/FFPLAY Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
 
-import sys, os, json, re, time, datetime, command
-
+import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
 from streamlink.exceptions import PluginError, NoStreamsError
 from streamlink.plugin.api import validate, http, useragents
@@ -109,8 +108,10 @@ class bongacams(Plugin):
         print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(performer)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
-        print (colored("\n => Server URL => {} <=", "yellow", "on_blue")).format(urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
+        ls_url = re.sub('https', 'hlsvariant://https', hls_url)
+        server = re.sub('https://', '', urlnoproto)
+        print (colored("\n => Server => {} <=", "yellow", "on_blue")).format(server)
 
         if hls_url:
          try:
@@ -118,43 +119,70 @@ class bongacams(Plugin):
            while True:
             try:
              print
-             mode = int(raw_input(colored(" => Select mode: REC(1) or PLAY(0) => ", "yellow", "on_blue")))
+             mode = int(raw_input(colored(" => Select mode => LIVESTREAMER(3) FFMPEG(2) FFPLAY(1) RTMPDUMP(0) => ", "yellow", "on_blue")))
+             print
              break
             except ValueError:
              print(colored("\n => Input must be a number <=", "yellow", "on_red"))
            if mode == 0:
-             mod = 'PLAY'
+             mod = 'RTMPDUMP'
            if mode == 1:
-             mod = 'REC'
+             mod = 'FFPLAY'
+           if mode == 2:
+             mod = 'FFMPEG'
+           if mode == 3:
+             mod = 'LIVESTREAMER'
 
            timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
            stime = str(time.strftime("%H:%M:%S"))
            path = config.get('folders', 'output_folder')
-           filename = performer + '_BC_' + timestamp + '.flv'
-           pf = (path + filename)
+           fn1 = performer + '_BC_' + timestamp + '.flv'
+           fn2 = performer + '_BC_' + timestamp + '.mp4'
+           pf1 = (path + fn1)
+           pf2 = (path + fn2)
+           rtmpdump = config.get('files', 'rtmpdump')
            ffmpeg = config.get('files', 'ffmpeg')
            ffplay = config.get('files', 'ffplay')
+           livestreamer = config.get('files', 'livestreamer')
+           swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
 
-           if mod == 'PLAY':
+           if mod == 'RTMPDUMP':
+            uidn = random.randint(1000000,9999999)
+            uid = '150318{}'.format(uidn)
+            print (colored(" => Random UID => {} <=", "yellow", "on_blue")).format(uid)
             print
-            print (colored(" => PLAY => {} <=", "yellow", "on_magenta")).format(filename)
+            print (colored(' => RTMPDUMP => {} <=', 'yellow', 'on_red')).format(fn1)
+            print
+            command = 'start {} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -y"stream_{}?uid={}" -o"{}"'.format(rtmpdump,server,swf,performer,uid,pf1)
+            os.system(command)
+            print(colored(" => END <= ", 'yellow','on_blue'))
+            sys.exit()
+
+           if mod == 'FFPLAY':
+            print
+            print (colored(" => FFPLAY => {} <=", "yellow", "on_magenta")).format(fn1)
             print
             command = ('start {} -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,performer,stime,urlnoproto))
             os.system(command)
             print(colored(" => END <= ", "yellow","on_blue"))
             sys.exit()
 
-           if mod == 'REC':
+           if mod == 'FFMPEG':
             print
-            print (colored(" => PLAY => {} <=", "white", "on_magenta")).format(filename)
+            print (colored(" => FFMPEG => {} <=","yellow","on_red")).format(fn1)
             print
-            command = ('start {} -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,performer,stime,urlnoproto))
-            os.system(command)
-            print (colored(" => REC => {} <=","yellow","on_red")).format(filename)
-            print
-            command = ('start {} -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf))
+            command = ('start {} -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf1))
             os.system(command)
             print(colored(" => END <= ", "yellow","on_blue"))
+            sys.exit()
+
+           if mod == 'LIVESTREAMER':
+            print
+            print (colored(' => LIVESTREAMER => {} <=', 'yellow', 'on_red')).format(fn2)
+            print
+            command = ('start {} "{}" best -o {}'.format(livestreamer,ls_url,pf2))
+            os.system(command)
+            print(colored(" => END <= ", 'yellow','on_blue'))
             sys.exit()
 
          except Exception as e:
