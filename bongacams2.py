@@ -159,7 +159,6 @@ class bongacams(Plugin):
             sys.exit()
 
            if mod == 'FFPLAY':
-            print
             print (colored(" => FFPLAY => {} <=", "yellow", "on_magenta")).format(fn1)
             print
             command = ('start {} -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,performer,stime,urlnoproto))
@@ -168,7 +167,6 @@ class bongacams(Plugin):
             sys.exit()
 
            if mod == 'FFMPEG':
-            print
             print (colored(" => FFMPEG => {} <=","yellow","on_red")).format(fn1)
             print
             command = ('start {} -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf1))
@@ -177,7 +175,6 @@ class bongacams(Plugin):
             sys.exit()
 
            if mod == 'LIVESTREAMER':
-            print
             print (colored(' => LIVESTREAMER => {} <=', 'yellow', 'on_red')).format(fn2)
             print
             command = ('start {} "{}" best -o {}'.format(livestreamer,ls_url,pf2))
