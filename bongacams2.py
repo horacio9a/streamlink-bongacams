@@ -14,8 +14,6 @@ config = ConfigParser.ConfigParser()
 config.read('config.cfg')
 
 init()
-print(colored(" => START <= ", "yellow", "on_blue"))
-print
 
 CONST_AMF_GATEWAY_LOCATION = '/tools/amf.php'
 CONST_AMF_GATEWAY_PARAM = 'x-country'
