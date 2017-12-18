@@ -1,4 +1,4 @@
-# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM/YOUTUBE-DL Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
+# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM/YOUTUBE-DL Plugin v.1.0.1 by @horacio9a - Credits to @sdfwv for Python 2.7.14
 
 import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
@@ -122,7 +122,7 @@ class bongacams(Plugin):
             except ValueError:
              print(colored("\n => Input must be a number <=", "yellow", "on_red"))
            if mode == 0:
-             mod = 'RTMPDUMP'
+             mod = 'RTMP'
            if mode == 1:
              mod = 'FFPLAY'
            if mode == 2:
@@ -172,7 +172,7 @@ class bongacams(Plugin):
            if mod == 'FFMPEG':
             print (colored("\n => FFMPEG => {} <=","yellow","on_red")).format(fn1)
             print
-            command = ('start {} -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf1))
+            command = ('start {} -i {} -c:v copy -c:a aac -b:a 160k -ar 44100 {}'.format(ffmpeg,hls_url,pf1))
             os.system(command)
             print(colored(" => END <= ", "yellow","on_blue"))
             sys.exit()
