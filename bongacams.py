@@ -1,4 +1,4 @@
-# Bongacams Streamlink RTMPDUMP 24/7 Plugin v.1.0.0 by @horacio9a - Credits to @sdfwv for Python 2.7.13
+# Bongacams Streamlink RTMPDUMP Remote 24/7 Plugin v.1.0.2 by @horacio9a for Python 2.7.14 - Credits also to @sdfwv
 
 import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
@@ -59,9 +59,11 @@ class bongacams(Plugin):
 
         # redirect to profile page means stream is offline
         if '/profile/' in r.url:
-            print(colored("\n => Performer is OFFLINE <=","yellow","on_red"))
-            print
-            raise NoStreamsError(self.url)
+           print(colored("\n => Performer is OFFLINE <=","yellow","on_red"))
+           print(colored("\n => END <= ", 'yellow','on_blue'))
+           time.sleep(6)
+           sys.exit()
+
         if not r.ok:
             self.logger.debug("Status code for {0}: {1}", r.url, r.status_code)
             raise NoStreamsError(self.url)
@@ -114,28 +116,27 @@ class bongacams(Plugin):
          try:
           for s in HLSStream.parse_variant_playlist(self.session, hls_url, headers=headers).items():
            timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
-           stime = str(time.strftime("%H:%M:%S"))
            path = config.get('folders', 'output_folder_BC')
-           filename = performer + '_BC_' + timestamp + '.flv'
-           pf = (path + filename)
-           youtube = config.get('files', 'youtube')
+           fn = performer + '_BC_' + timestamp + '.flv'
+           pf = (path + fn)
+           rtmp = config.get('files', 'rtmpdump')
            uidn = random.randint(1000000,9999999)
            uid = '150318{}'.format(uidn)
            rtmp_url = ('rtmp://{}:1935/bongacams/stream_{}?uid={}'.format(server,performer,uid))
+           swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
            print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
-           print (colored('\n => YOUTUBE-DL REC => {} <=', 'yellow', 'on_red')).format(filename)
+           print (colored('\n => RTMP-24/7-REC => {} <=', 'yellow', 'on_red')).format(fn)
            print
-           command = ('{} --hls-prefer-native --no-part "{}" -o {}'.format(youtube,rtmp_url,pf))
+           command = '{} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,swf,performer,uid,pf)
            os.system(command)
            print(colored("\n => END <= ", 'yellow','on_blue'))
            sys.exit()
 
          except Exception as e:
-           if '404' in str(e):
-              print(colored("\n => Performer is AWAY or PRIVATE <=","yellow","on_red"))
-              print
-           else:
-              self.logger.error(str(e))
-           return
+          if '404' in str(e):
+           print(colored("\n => Performer is AWAY or PRIVATE <=","yellow","on_red"))
+           print(colored("\n => END <= ", 'yellow','on_blue'))
+           time.sleep(6)
+           sys.exit()
 
 __plugin__ = bongacams
