@@ -24,18 +24,7 @@ CONST_HEADERS['User-Agent'] = useragents.CHROME
 
 url_re = re.compile(r"(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)")
 
-amf_msg_schema = validate.Schema({
-    "status": "success",
-    "userData": {
-        "username": validate.text
-    },
-    "localData": {
-        "videoServerUrl": validate.text
-    },
-    "performerData": {
-        "username": validate.text,
-    }
-})
+amf_msg_schema = validate.Schema({"status": "success","userData": {"username": validate.text},"localData": {"videoServerUrl": validate.text},"performerData": {"username": validate.text,"displayName": validate.text}})
 
 class bongacams(Plugin):
     @classmethod
@@ -105,7 +94,8 @@ class bongacams(Plugin):
             return
 
         performer = stream_source_info['performerData']['username']
-        print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(performer)
+        real_name = stream_source_info['performerData']['displayName']
+        print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(real_name)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
@@ -140,10 +130,10 @@ class bongacams(Plugin):
            timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
            stime = str(time.strftime("%H:%M:%S"))
            path = config.get('folders', 'output_folder_BC')
-           fn = performer + '_BC_' + timestamp
-           fn1 = performer + '_BC_' + timestamp + '.flv'
-           fn2 = performer + '_BC_' + timestamp + '.mp4'
-           fn3 = performer + '_BC_' + timestamp + '.ts'
+           fn = real_name + '_BC_' + timestamp
+           fn1 = real_name + '_BC_' + timestamp + '.flv'
+           fn2 = real_name + '_BC_' + timestamp + '.mp4'
+           fn3 = real_name + '_BC_' + timestamp + '.ts'
            pf1 = (path + fn1)
            pf2 = (path + fn2)
            pf3 = (path + fn3)
@@ -167,7 +157,7 @@ class bongacams(Plugin):
            if mod == 'FFPLAY':
             print (colored("\n => FFPLAY => {} <=", "yellow", "on_magenta")).format(fn)
             print
-            command = ('{} -hide_banner -loglevel panic -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,performer,stime,urlnoproto))
+            command = ('{} -hide_banner -loglevel panic -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,real_name,stime,urlnoproto))
             os.system(command)
             print(colored(" => END <= ", "yellow","on_blue"))
 
