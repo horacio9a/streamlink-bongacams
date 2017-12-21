@@ -28,7 +28,7 @@ amf_msg_schema = validate.Schema(
  {"status": "success","userData": 
   {"username": validate.text},"localData": 
    {"videoServerUrl": validate.text},"performerData": 
-    {"username": validate.text,"displayName": validate.text}})
+    {"username": validate.text,"displayName": validate.text,"userId": validate.get}})
 
 class bongacams(Plugin):
     @classmethod
@@ -99,7 +99,9 @@ class bongacams(Plugin):
 
         performer = stream_source_info['performerData']['username']
         real_name = stream_source_info['performerData']['displayName']
+        performer_id = stream_source_info['performerData']['userId']
         print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(real_name)
+        print (colored("\n => Performer ID => {} <=", "yellow", "on_blue")).format(performer_id)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
@@ -151,7 +153,6 @@ class bongacams(Plugin):
            if mod == 'RTMP':
             uidn = random.randint(1000000,9999999)
             uid = '150318{}'.format(uidn)
-            print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
             print (colored('\n => RTMP-REC => {} <=', 'yellow', 'on_red')).format(fn1)
             print
             command = '{} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,swf,performer,uid,pf1)
@@ -182,7 +183,6 @@ class bongacams(Plugin):
            if mod == 'YTDL-FLV':
             uidn = random.randint(1000000,9999999)
             uid = '150318{}'.format(uidn)
-            print (colored("\n => Random UID => {} <=", "yellow", "on_blue")).format(uid)
             print (colored('\n => YTDL-FLV-REC => {} <=', 'yellow', 'on_red')).format(fn1)
             rtmp_url = ('rtmp://{}:1935/bongacams/stream_{}?uid={}'.format(server,performer,uid))
             command = ('{} --no-part {} -q -o {}'.format(youtube,rtmp_url,pf1))
