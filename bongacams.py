@@ -24,18 +24,11 @@ CONST_HEADERS['User-Agent'] = useragents.CHROME
 
 url_re = re.compile(r"(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)")
 
-amf_msg_schema = validate.Schema({
-    "status": "success",
-    "userData": {
-        "username": validate.text
-    },
-    "localData": {
-        "videoServerUrl": validate.text
-    },
-    "performerData": {
-        "username": validate.text,
-    }
-})
+amf_msg_schema = validate.Schema(
+ {"status": "success","userData": 
+  {"username": validate.text},"localData": 
+   {"videoServerUrl": validate.text},"performerData": 
+    {"username": validate.text,"displayName": validate.text}})
 
 class bongacams(Plugin):
     @classmethod
@@ -105,7 +98,8 @@ class bongacams(Plugin):
             return
 
         performer = stream_source_info['performerData']['username']
-        print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(performer)
+        real_name = stream_source_info['performerData']['displayName']
+        print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(real_name)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
@@ -117,7 +111,7 @@ class bongacams(Plugin):
           for s in HLSStream.parse_variant_playlist(self.session, hls_url, headers=headers).items():
            timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
            path = config.get('folders', 'output_folder_BC')
-           fn = performer + '_BC_' + timestamp + '.flv'
+           fn = real_name + '_BC_' + timestamp + '.flv'
            pf = (path + fn)
            rtmp = config.get('files', 'rtmpdump')
            uidn = random.randint(1000000,9999999)
