@@ -24,7 +24,11 @@ CONST_HEADERS['User-Agent'] = useragents.CHROME
 
 url_re = re.compile(r"(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)")
 
-amf_msg_schema = validate.Schema({"status": "success","userData": {"username": validate.text},"localData": {"videoServerUrl": validate.text},"performerData": {"username": validate.text,"displayName": validate.text}})
+amf_msg_schema = validate.Schema(
+ {"status": "success","userData": 
+  {"username": validate.text},"localData": 
+   {"videoServerUrl": validate.text},"performerData": 
+    {"username": validate.text,"displayName": validate.text}})
 
 class bongacams(Plugin):
     @classmethod
