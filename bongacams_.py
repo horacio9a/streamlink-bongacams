@@ -1,4 +1,5 @@
-# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM/YOUTUBE-DL Plugin v.1.0.2 by @horacio9a for Python 2.7.14 - Credits also to @sdfwv
+# Bongacams Streamlink RTMPDUMP/FFMPEG/FFPLAY/LIVESTREAM/YOUTUBE-DL Plugin v.1.0.3 by @horacio9a for Python 2.7.14 - Credits also to @sdfwv
+# coding: utf-8
 
 import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
@@ -22,13 +23,13 @@ CONST_DEFAULT_COUNTRY_CODE = 'en'
 CONST_HEADERS = {}
 CONST_HEADERS['User-Agent'] = useragents.CHROME
 
-url_re = re.compile(r"(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)")
+url_re = re.compile(r'(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)')
 
 amf_msg_schema = validate.Schema(
- {"status": "success","userData": 
-  {"username": validate.text},"localData": 
-   {"videoServerUrl": validate.text},"performerData": 
-    {"username": validate.text,"displayName": validate.text,"userId": validate.get}})
+ {'status': 'success','userData': 
+  {'username': validate.text},'localData': 
+   {'videoServerUrl': validate.text},'performerData': 
+    {'username': validate.text,'displayName': validate.text,'userId': validate.get}})
 
 class bongacams(Plugin):
     @classmethod
@@ -52,13 +53,13 @@ class bongacams(Plugin):
 
         # redirect to profile page means stream is offline
         if '/profile/' in r.url:
-           print(colored("\n => Performer is OFFLINE <=","yellow","on_red"))
-           print(colored("\n => END <= ", 'yellow','on_blue'))
+           print(colored('\n => Performer is OFFLINE <=','yellow','on_red'))
+           print(colored('\n => END <= ', 'yellow','on_blue'))
            time.sleep(6)
            sys.exit()
 
         if not r.ok:
-            self.logger.debug("Status code for {0}: {1}", r.url, r.status_code)
+            self.logger.debug('Status code for {0}: {1}', r.url, r.status_code)
             raise NoStreamsError(self.url)
         if len(http_session.cookies) == 0:
             raise PluginError("Can't get a cookies")
@@ -89,10 +90,10 @@ class bongacams(Plugin):
         http_session.close()
 
         if r.status_code != 200:
-            raise PluginError("unexpected status code for {0}: {1}", r.url, r.status_code)
+            raise PluginError('unexpected status code for {0}: {1}', r.url, r.status_code)
 
         stream_source_info = amf_msg_schema.validate(json.loads(r.text))
-        self.logger.debug("source stream info:\n{0}", stream_source_info)
+        self.logger.debug('source stream info:\n{0}', stream_source_info)
 
         if not stream_source_info:
             return
@@ -100,13 +101,12 @@ class bongacams(Plugin):
         performer = stream_source_info['performerData']['username']
         real_name = stream_source_info['performerData']['displayName']
         performer_id = stream_source_info['performerData']['userId']
-        print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(real_name)
-        print (colored("\n => Performer ID => {} <=", "yellow", "on_blue")).format(performer_id)
+        print (colored('\n => Performer => {} <=', 'yellow', 'on_blue')).format(real_name)
+        print (colored('\n => Performer ID => {} <=', 'yellow', 'on_blue')).format(performer_id)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
         server = re.sub('https://', '', urlnoproto)
-        print (colored("\n => Server => {} <=", "yellow", "on_blue")).format(server)
 
         if hls_url:
          try:
@@ -114,10 +114,10 @@ class bongacams(Plugin):
            while True:
             try:
              print
-             mode = int(raw_input(colored(" => Mode => EXIT(6)  YTDL-TS(5)  YTDL-FLV(4)  LS(3)  FFMPEG(2)  FFPLAY(1)  RTMP(0) => ", "yellow", "on_blue")))
+             mode = int(raw_input(colored(' => Mode => EXIT(6)  YTDL-TS(5)  YTDL-FLV(4)  LS(3)  FFMPEG(2)  FFPLAY(1)  RTMP(0) => ', 'yellow', 'on_blue')))
              break
             except ValueError:
-             print(colored("\n => Input must be a number <=", "yellow", "on_red"))
+             print(colored('\n => Input must be a number <=', 'yellow', 'on_red'))
            if mode == 0:
              mod = 'RTMP'
            if mode == 1:
@@ -133,8 +133,8 @@ class bongacams(Plugin):
            if mode == 6:
              mod = 'EXIT'
 
-           timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
-           stime = str(time.strftime("%H:%M:%S"))
+           timestamp = str(time.strftime('%d%m%Y-%H%M%S'))
+           stime = str(time.strftime('%H:%M:%S'))
            path = config.get('folders', 'output_folder_BC')
            fn = real_name + '_BC_' + timestamp
            fn1 = real_name + '_BC_' + timestamp + '.flv'
@@ -148,63 +148,67 @@ class bongacams(Plugin):
            ffplay = config.get('files', 'ffplay')
            livestreamer = config.get('files', 'livestreamer')
            youtube = config.get('files', 'youtube')
-           swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
 
            if mod == 'RTMP':
             uidn = random.randint(1000000,9999999)
             uid = '150318{}'.format(uidn)
+            print (colored('\n => Server => {} <=', 'yellow', 'on_blue')).format(server)
             print (colored('\n => RTMP-REC => {} <=', 'yellow', 'on_red')).format(fn1)
             print
-            command = '{} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,swf,performer,uid,pf1)
+            command = '{} -r"rtmp://{}/bongacams" -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,performer,uid,pf1)
             os.system(command)
-            print(colored(" => END <= ", 'yellow','on_blue'))
+            print(colored(' => END <= ', 'yellow','on_blue'))
 
            if mod == 'FFPLAY':
-            print (colored("\n => FFPLAY => {} <=", "yellow", "on_magenta")).format(fn)
+            print (colored('\n => HLS URL => {} <=', 'yellow', 'on_blue')).format(hls_url)
+            print (colored('\n => FFPLAY => {} <=', 'yellow', 'on_magenta')).format(fn)
             print
             command = ('{} -hide_banner -loglevel panic -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,real_name,stime,urlnoproto))
             os.system(command)
-            print(colored(" => END <= ", "yellow","on_blue"))
+            print(colored(' => END <= ', 'yellow','on_blue'))
 
            if mod == 'FFMPEG':
-            print (colored("\n => FFMPEG-REC => {} <=","yellow","on_red")).format(fn1)
+            print (colored('\n => HLS URL => {} <=', 'yellow', 'on_blue')).format(hls_url)
+            print (colored('\n => FFMPEG-REC => {} <=','yellow','on_red')).format(fn1)
             print
             command = ('{} -hide_banner -loglevel panic -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf1))
             os.system(command)
-            print(colored(" => END <= ", "yellow","on_blue"))
+            print(colored(' => END <= ', 'yellow','on_blue'))
 
            if mod == 'LS':
             print (colored('\n => LS-REC >>> {} <<<', 'yellow', 'on_red')).format(fn2)
             print
             command = ('{} hlsvariant://"{}" best -Q -o "{}"'.format(livestreamer,hls_url,pf2))
             os.system(command)
-            print(colored(" => END <= ", 'yellow','on_blue'))
+            print(colored(' => END <= ', 'yellow','on_blue'))
 
            if mod == 'YTDL-FLV':
             uidn = random.randint(1000000,9999999)
             uid = '150318{}'.format(uidn)
+            print (colored('\n => Server => {} <=', 'yellow', 'on_blue')).format(server)
             print (colored('\n => YTDL-FLV-REC => {} <=', 'yellow', 'on_red')).format(fn1)
-            rtmp_url = ('rtmp://{}:1935/bongacams/stream_{}?uid={}'.format(server,performer,uid))
+            rtmp_url = ('rtmp://{}/bongacams/stream_{}?uid={}'.format(server,performer,uid))
             command = ('{} --no-part {} -q -o {}'.format(youtube,rtmp_url,pf1))
             os.system(command)
-            print(colored("\n => END <= ", 'yellow','on_blue'))
+            print(colored('\n => END <= ', 'yellow','on_blue'))
 
            if mod == 'YTDL-TS':
+            print (colored('\n => HLS URL => {} <=', 'yellow', 'on_blue')).format(hls_url)
             print (colored('\n => YTDL-TS-REC => {} <=', 'yellow', 'on_red')).format(fn3)
             command = ('{} --hls-use-mpegts --no-part {} -q -o {}'.format(youtube,hls_url,pf3))
             os.system(command)
-            print(colored("\n => END <= ", 'yellow','on_blue'))
+            print(colored('\n => END <= ', 'yellow','on_blue'))
             sys.exit()
 
            if mod == 'EXIT':
-              print(colored("\n => END <= ", 'yellow','on_blue'))
+              print(colored('\n => END <= ', 'yellow','on_blue'))
               time.sleep(3)
               sys.exit()
 
          except Exception as e:
           if '404' in str(e):
-           print(colored("\n => Performer is AWAY or PRIVATE <=","yellow","on_red"))
-           print(colored("\n => END <= ", 'yellow','on_blue'))
+           print(colored('\n => Performer is AWAY or PRIVATE <=','yellow','on_red'))
+           print(colored('\n => END <= ', 'yellow','on_blue'))
            time.sleep(6)
            sys.exit()
 
