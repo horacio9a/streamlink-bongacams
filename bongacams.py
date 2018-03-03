@@ -1,4 +1,5 @@
-# Bongacams Streamlink RTMPDUMP Remote 24/7 Plugin v.1.0.2 by @horacio9a for Python 2.7.14 - Credits also to @sdfwv
+# Bongacams Streamlink RTMPDUMP Remote 24/7 Plugin v.1.0.3 by @horacio9a for Python 2.7.14 - Credits also to @sdfwv
+# coding: utf-8
 
 import sys, os, json, re, time, datetime, random, command
 from streamlink.compat import urljoin, urlparse, urlunparse
@@ -22,13 +23,13 @@ CONST_DEFAULT_COUNTRY_CODE = 'en'
 CONST_HEADERS = {}
 CONST_HEADERS['User-Agent'] = useragents.CHROME
 
-url_re = re.compile(r"(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)")
+url_re = re.compile(r'(http(s)?://)?(\w{2}.)?(bongacams\.com)/([\w\d_-]+)')
 
 amf_msg_schema = validate.Schema(
- {"status": "success","userData": 
-  {"username": validate.text},"localData": 
-   {"videoServerUrl": validate.text},"performerData": 
-    {"username": validate.text,"displayName": validate.text,"userId": validate.get}})
+ {'status': 'success','userData': 
+  {'username': validate.text},'localData': 
+   {'videoServerUrl': validate.text},'performerData': 
+    {'username': validate.text,'displayName': validate.text,'userId': validate.get}})
 
 class bongacams(Plugin):
     @classmethod
@@ -52,13 +53,13 @@ class bongacams(Plugin):
 
         # redirect to profile page means stream is offline
         if '/profile/' in r.url:
-           print(colored("\n => Performer is OFFLINE <=","yellow","on_red"))
-           print(colored("\n => END <= ", 'yellow','on_blue'))
+           print(colored('\n => Performer is OFFLINE <=','yellow','on_red'))
+           print(colored('\n => END <= ', 'yellow','on_blue'))
            time.sleep(6)
            sys.exit()
 
         if not r.ok:
-            self.logger.debug("Status code for {0}: {1}", r.url, r.status_code)
+            self.logger.debug('Status code for {0}: {1}', r.url, r.status_code)
             raise NoStreamsError(self.url)
         if len(http_session.cookies) == 0:
             raise PluginError("Can't get a cookies")
@@ -89,10 +90,10 @@ class bongacams(Plugin):
         http_session.close()
 
         if r.status_code != 200:
-            raise PluginError("unexpected status code for {0}: {1}", r.url, r.status_code)
+            raise PluginError('unexpected status code for {0}: {1}', r.url, r.status_code)
 
         stream_source_info = amf_msg_schema.validate(json.loads(r.text))
-        self.logger.debug("source stream info:\n{0}", stream_source_info)
+        self.logger.debug('source stream info:\n{0}', stream_source_info)
 
         if not stream_source_info:
             return
@@ -100,37 +101,34 @@ class bongacams(Plugin):
         performer = stream_source_info['performerData']['username']
         real_name = stream_source_info['performerData']['displayName']
         performer_id = stream_source_info['performerData']['userId']
-        print (colored("\n => Performer => {} <=", "yellow", "on_blue")).format(real_name)
-        print (colored("\n => Performer ID => {} <=", "yellow", "on_blue")).format(performer_id)
+        print (colored('\n => Performer => {} <=', 'yellow', 'on_blue')).format(real_name)
+        print (colored('\n => Performer ID => {} <=', 'yellow', 'on_blue')).format(performer_id)
         urlnoproto = stream_source_info['localData']['videoServerUrl']
         urlnoproto = update_scheme('https://', urlnoproto)
         hls_url = '{0}/hls/stream_{1}/playlist.m3u8'.format(urlnoproto, performer)
         server = re.sub('https://', '', urlnoproto)
-        print (colored("\n => Server => {} <=", "yellow", "on_blue")).format(server)
+        print (colored('\n => Server => {} <=', 'yellow', 'on_blue')).format(server)
 
         if hls_url:
          try:
           for s in HLSStream.parse_variant_playlist(self.session, hls_url, headers=headers).items():
-           timestamp = str(time.strftime("%d%m%Y-%H%M%S"))
+           timestamp = str(time.strftime('%d%m%Y-%H%M%S'))
            path = config.get('folders', 'output_folder_BC')
            fn = real_name + '_BC_' + timestamp + '.flv'
            pf = (path + fn)
            rtmp = config.get('files', 'rtmpdump')
            uidn = random.randint(1000000,9999999)
            uid = '150318{}'.format(uidn)
-           rtmp_url = ('rtmp://{}:1935/bongacams/stream_{}?uid={}'.format(server,performer,uid))
-           swf = 'https://en.bongacams.com/swf/chat/BCamPlayer.swf'
            print (colored('\n => RTMP-24/7-REC => {} <=', 'yellow', 'on_red')).format(fn)
-           print
-           command = '{} -r"rtmp://{}:1935/bongacams" -a"bongacams" -s"{}" --live -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,swf,performer,uid,pf)
+           command = '{} -r"rtmp://{}/bongacams" -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,performer,uid,pf)
            os.system(command)
-           print(colored("\n => END <= ", 'yellow','on_blue'))
+           print(colored('\n => END <= ', 'yellow','on_blue'))
            sys.exit()
 
          except Exception as e:
           if '404' in str(e):
-           print(colored("\n => Performer is AWAY or PRIVATE <=","yellow","on_red"))
-           print(colored("\n => END <= ", 'yellow','on_blue'))
+           print(colored('\n => Performer is AWAY or PRIVATE <=','yellow','on_red'))
+           print(colored('\n => END <= ', 'yellow','on_blue'))
            time.sleep(6)
            sys.exit()
 
