@@ -1,6 +1,7 @@
 @ECHO OFF
 SETLOCAL EnableDelayedExpansion
 :START
+SET OUT_DIR=C:/Videos/BC/
 CLS
 SET n=0
 FOR /F "tokens=*" %%A IN (C:\Windows\BC_Model.txt) DO (
@@ -27,6 +28,7 @@ IF "%MODE%"=="2" GOTO START
 IF "%MODE%"=="3" GOTO EXIT
 ECHO.
 :BC-SL
+COLOR 0F
 SET MODELNAME=%MODEL% ######### %M% ###########################
 SET _MODEL_=%MODELNAME:~0,33%
 ECHO.
@@ -35,13 +37,14 @@ ECHO ### BC-SL ####### R E C O R D I N G ###############
 ECHO ################# %_MODEL_%
 ECHO ###################################################
 ECHO.
-COLOR 0F
-cd/
-cd Python27/Scripts
+cd C:/Python27/Scripts
 START STREAMLINK "https://en.bongacams.com/%MODEL%/"
+cd %OUT_DIR%
+FOR /R %%F in (*) DO IF %%~ZF LSS 40 DEL "%%F"
 PAUSE
 GOTO START
 :BC-SL-R
+COLOR 0F
 SET MODELNAME=%MODEL% ######### %M% ###########################
 SET _MODEL_=%MODELNAME:~0,33%
 ECHO.
@@ -50,10 +53,10 @@ ECHO ### BC-SL-R ##### R E C O R D I N G ###### 24/7 ###
 ECHO ################# %_MODEL_%
 ECHO ###################################################
 ECHO.
-COLOR 0F
-cd/
-cd Python27/Scripts
+cd C:/Python27/Scripts
 STREAMLINK "https://en.bongacams.com/%MODEL%/"
+cd %OUT_DIR%
+FOR /R %%F in (*) DO IF %%~ZF LSS 40 DEL "%%F"
 TIMEOUT 30
 GOTO BC-SL-R
 :EXIT
