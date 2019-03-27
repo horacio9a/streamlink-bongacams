@@ -1,7 +1,8 @@
 streamlink==0.9.0
+livestreamer==1.12.2
 DateTime==4.1.1
-requests==2.18.1
+requests==2.21.0
 Command==0.1.0
-colorama==0.3.8
+colorama==0.4.0
 termcolor==1.1.0
 configparser==3.5.0
