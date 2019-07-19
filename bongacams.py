@@ -1,4 +1,4 @@
-# Bongacams Streamlink RTMPDUMP Remote 24/7 Plugin v.1.0.3 by @horacio9a for Python 2.7.14 - Credits also to @sdfwv
+# Bongacams Streamlink FFPLAY/FFMPEG/LIVESTREAM/STREAMLINK/YOUTUBE-DL Plugin v.1.0.4 by @horacio9a for Python 2.7.16 - Credits also to @sdfwv
 # coding: utf-8
 
 import sys, os, json, re, time, datetime, random, command
@@ -12,7 +12,7 @@ from colorama import init, Fore, Back, Style
 from termcolor import colored
 import ConfigParser
 config = ConfigParser.ConfigParser()
-config.read('config.cfg')
+config.read('config.ini')
 
 init()
 
@@ -112,18 +112,84 @@ class bongacams(Plugin):
         if hls_url:
          try:
           for s in HLSStream.parse_variant_playlist(self.session, hls_url, headers=headers).items():
+           while True:
+            try:
+             print
+             mode = int(raw_input(colored(' => Mode => EXIT(5)  YTDL-TS(4)  SL(3)  LS(2)  FFMPEG(1)  FFPLAY(0) => ', 'yellow', 'on_blue')))
+             break
+            except ValueError:
+             print(colored('\n => Input must be a number <=', 'yellow', 'on_red'))
+           if mode == 0:
+             mod = 'FFPLAY'
+           if mode == 1:
+             mod = 'FFMPEG'
+           if mode == 2:
+             mod = 'LS'
+           if mode == 3:
+             mod = 'SL'
+           if mode == 4:
+             mod = 'YTDL-TS'
+           if mode == 5:
+             mod = 'EXIT'
+
            timestamp = str(time.strftime('%d%m%Y-%H%M%S'))
+           stime = str(time.strftime('%H:%M:%S'))
            path = config.get('folders', 'output_folder_BC')
-           fn = real_name + '_BC_' + timestamp + '.flv'
-           pf = (path + fn)
-           rtmp = config.get('files', 'rtmpdump')
-           uidn = random.randint(1000000,9999999)
-           uid = '150318{}'.format(uidn)
-           print (colored('\n => RTMP-24/7-REC => {} <=', 'yellow', 'on_red')).format(fn)
-           command = '{} -r"rtmp://{}/bongacams" -m 2 -q -y"stream_{}?uid={}" -o"{}"'.format(rtmp,server,performer,uid,pf)
-           os.system(command)
-           print(colored('\n => END <= ', 'yellow','on_blue'))
-           sys.exit()
+           fn = real_name + '_BC_' + timestamp
+           fn1 = real_name + '_BC_' + timestamp + '.flv'
+           fn2 = real_name + '_BC_' + timestamp + '.mp4'
+           fn3 = real_name + '_BC_' + timestamp + '.ts'
+           pf1 = (path + fn1)
+           pf2 = (path + fn2)
+           pf3 = (path + fn3)
+           ffmpeg = config.get('files', 'ffmpeg')
+           ffplay = config.get('files', 'ffplay')
+           livestreamer = config.get('files', 'livestreamer')
+           streamlink = config.get('files', 'streamlink')
+           youtube = config.get('files', 'youtube')
+
+           if mod == 'FFPLAY':
+            print (colored('\n => HLS URL => {} <=', 'yellow', 'on_blue')).format(hls_url)
+            print (colored('\n => FFPLAY => {} <=', 'yellow', 'on_magenta')).format(fn)
+            print
+            command = ('{} -hide_banner -loglevel panic -i {} -infbuf -autoexit -window_title "{} * {} * {}"'.format(ffplay,hls_url,real_name,stime,urlnoproto))
+            os.system(command)
+            print(colored(' => END <= ', 'yellow','on_blue'))
+
+           if mod == 'FFMPEG':
+            print (colored('\n => HLS URL => {} <=', 'yellow', 'on_blue')).format(hls_url)
+            print (colored('\n => FFMPEG-REC => {} <=','yellow','on_red')).format(fn1)
+            print
+            command = ('{} -hide_banner -loglevel panic -i {} -c:v copy -c:a aac -b:a 160k {}'.format(ffmpeg,hls_url,pf1))
+            os.system(command)
+            print(colored(' => END <= ', 'yellow','on_blue'))
+
+           if mod == 'LS':
+            print (colored('\n => LS-REC >>> {} <<<', 'yellow', 'on_red')).format(fn2)
+            print
+            command = ('{} hlsvariant://"{}" best -Q -o "{}"'.format(livestreamer,hls_url,pf2))
+            os.system(command)
+            print(colored(' => END <= ', 'yellow','on_blue'))
+
+           if mod == 'SL':
+            print (colored('\n => SL-REC >>> {} <<<', 'yellow', 'on_red')).format(fn2)
+            print
+            command = ('{} hls://"{}" best -Q -o "{}"'.format(streamlink,hls_url,pf2))
+            os.system(command)
+            print(colored(' => END <= ', 'yellow','on_blue'))
+
+           if mod == 'YTDL-TS':
+            print (colored('\n => HLS URL => {} <=', 'yellow', 'on_blue')).format(hls_url)
+            print (colored('\n => YTDL-TS-REC => {} <=', 'yellow', 'on_red')).format(fn3)
+            command = ('{} --hls-use-mpegts --no-part {} -q -o {}'.format(youtube,hls_url,pf3))
+            os.system(command)
+            print(colored('\n => END <= ', 'yellow','on_blue'))
+            sys.exit()
+
+           if mod == 'EXIT':
+              print(colored('\n => END <= ', 'yellow','on_blue'))
+              time.sleep(3)
+              sys.exit()
 
          except Exception as e:
           if '404' in str(e):
